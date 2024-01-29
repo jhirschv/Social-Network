@@ -1,0 +1,92 @@
+{% extends "layout.html" %}
+{% load static %}
+{% block body %}
+    {% if user.is_authenticated %}
+
+
+
+
+<div class="header-layout">
+    <div class="home-button">
+        <div class="home-button-div">
+            <i class="fa-solid fa-house"></i><a href="{% url 'index' %}">Home</a>
+        </div>
+    </div>
+    <div class="profile-header-container">
+        {% if profile.profile_picture %}
+        <img src="{{ profile.profile_picture.url }}" alt="Profile picture">
+        {% else %}
+        <img src="{% static 'default_profile_pic.jpg' %}" alt="Default profile picture">
+        {% endif %}
+        <div class="profile-info">
+            <div>
+                <h1>{{ profile.username }}</h1>
+                {% if user != profile %}
+                <form method="POST" action="{% if isFollowing %}{% url 'unfollow' profile.id %}{% else %}{% url 'follow' profile.id %}{% endif %}">
+                    {% csrf_token %}
+                    <input type="submit" value="{% if isFollowing %}Unfollow{% else %}Follow{% endif %}">
+                </form>
+                {% endif %}
+            </div>
+            <div>
+                <h3>Followers: {{ followers.count }}</h3>
+                <h3>Following: {{ following.count }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <div class="profile-layout">
+
+        <div class="buddies-section">
+            <h1>Followers</h1>
+            <div class="following-profiles">
+                {% for follower in followers %}
+                <div class="following-profile">
+                    {% if follower.follower.profile_picture %}
+                        <img src="{{ follower.follower.profile_picture.url }}" alt="Profile picture">
+                            {% else %}
+                        <img src="{% static 'default_profile_pic.jpg' %}" alt="Default profile picture">
+                            {% endif %}
+                    <h3><a href="{% url 'profile' id=follower.follower.id %}">{{ follower.follower.username }}</a></h3>
+                </div>
+
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="post-section">
+            {% for post in allUserPosts %}
+            <div class="post">
+                <div class="user-profile">
+                    {% if user.profile_picture %}
+                        <img src="{{ post.user.profile_picture.url }}" alt="Profile picture">
+                            {% else %}
+                        <img src="{% static 'default_profile_pic.jpg' %}" alt="Default profile picture">
+                            {% endif %}
+                    <div>
+                        <p><a href="{% url 'profile' id=post.user.id %}">{{post.user}}</a></p>
+                        <span>{{post.date}}</span>
+                    </div>
+                </div>
+                <div class="post-content">
+                    <p>{{post.content}}</p>
+                </div>
+                <div class="interactions">
+                    <div class="like-btn" data-post-id="{{post.id}}"><i class="fa-solid fa-heart" id="heart-{{ post.id }}"></i><p id="like-count-{{ post.id }}"></p></div>
+                    <div><i class="fa-solid fa-comment"></i>Comment</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+
+    {% endif %}
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'script.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,149 @@
+{% extends "layout.html" %}
+{% load static %}
+{% block body %}
+    {% if user.is_authenticated %}
+    <div class="layout">
+        <div class="left-sidebar">
+
+            <div class="side-bar">
+                <ul>
+                      <li>
+                        {% if user.profile_picture %}
+                        <img src="{{ user.profile_picture.url }}" alt="Profile picture">
+                        {% else %}
+                        <img src="{% static 'default_profile_pic.jpg' %}" alt="Default profile picture">
+                        {% endif %}
+                        <a href="{% url 'profile' id=user.id %}"><strong>{{ user.username }}</strong></a>
+                      </li>
+                      <li>
+                        <i class="fa-solid fa-house"></i><a href="{% url 'index' %}">Home</a>
+                      </li>
+                      <li>
+                        <i class="fa-solid fa-bell"></i><a href="#">Notifications</a>
+                      </li>
+                      <li>
+                        <i class="fa-solid fa-envelope"></i><a href="{% url 'direct_message' %}">Messages</a>
+                      </li>
+                      <li>
+                        <i class="fa-solid fa-gear"></i><a href="#">Settings</a>
+                      </li>
+                      <li>
+                        <i class="fa-solid fa-right-from-bracket"></i> <a href="{% url 'logout' %}">Log Out</a>
+                      </li>
+
+                </ul>
+            </div>
+        </div>
+
+
+        <div class="main-content">
+            <div class="create-post-container">
+                <form action="{% url 'newPost' %}" method="post">
+                    {% csrf_token %}
+                    <div class="create-post-top">
+                        {% if user.profile_picture %}
+                        <img src="{{ user.profile_picture.url }}" alt="Profile picture">
+                        {% else %}
+                        <img src="{% static 'default_profile_pic.jpg' %}" alt="Default profile picture">
+                        {% endif %}
+                        <textarea name="content" placeholder="What's on ya mind playa?"></textarea>
+                    </div>
+                    <div class="create-post-bottom">
+                        <button type="submit">Post</button>
+                    </div>
+               </form>
+            </div>
+
+            <div class="all-posts">
+                {% for post in posts %}
+                <div class="post">
+                    <div class="user-profile">
+                        {% if user.profile_picture %}
+                        <img src="{{ post.user.profile_picture.url }}" alt="Profile picture">
+                        {% else %}
+                        <img src="{% static 'default_profile_pic.jpg' %}" alt="Default profile picture">
+                        {% endif %}
+                        <div>
+                            <p><a href="{% url 'profile' id=post.user.id %}">{{post.user}}</a></p>
+                            <span>{{post.date}}</span>
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        <p>{{post.content}}</p>
+                    </div>
+                    <div class="interactions">
+                        <div class="like-btn" data-post-id="{{post.id}}"><i class="fa-solid fa-heart" id="heart-{{ post.id }}"></i><p id="like-count-{{ post.id }}"></p></div>
+                        <div class="comment-box-btn" data-post-id="{{post.id}}"><i class="fa-solid fa-comment" id="comment-{{ post.id }}"></i><p id="comment-count-{{ post.id }}"></p></div>
+                    </div>
+                </div>
+
+                <div id="comment-box-overlay" class="comment-box-overlay hidden">
+                    <div class="comment-box">
+                        <div class="comment-box-top">
+                            <div id="closeBtn">
+                                <i class="fa-solid fa-circle-xmark"></i>
+                            </div>
+                        </div>
+                        <div id="post-comments" class="comment-box-middle">
+
+                        </div>
+                        <form id="comment-form">
+                            <div class="textarea-container">
+                                <textarea id="comment-textarea" placeholder="Add a comment..."></textarea>
+                            </div>
+                            <div class="comment-box-bottom">
+                                <button>Submit</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+
+
+            <div class="pagination">
+                <button class="btn1" {% if posts.has_previous %}onclick="window.location.href='?page={{ posts.previous_page_number }}'"{% else %}disabled{% endif %}>Previous</button>
+                <ul>
+                    {% for i in posts.paginator.page_range %}
+                        <li class="{% if posts.number == i %}active{% endif %}" onclick="window.location.href='?page={{ i }}'" value="{{ i }}">{{ i }}</li>
+                    {% endfor %}
+                </ul>
+                <button class="btn2" {% if posts.has_next %}onclick="window.location.href='?page={{ posts.next_page_number }}'"{% else %}disabled{% endif %}>Next</button>
+            </div>
+        </div>
+
+
+
+
+        <div class="right-sidebar">
+            <div class="right-sidebar-container">
+                <h1>Following</h1>
+                <div class="following-profiles">
+                    {% for follower in following %}
+                    <div class="following-profile">
+                        {% if follower.followed.profile_picture %}
+                            <img src="{{ follower.followed.profile_picture.url }}" alt="Profile picture">
+                                {% else %}
+                            <img src="{% static 'default_profile_pic.jpg' %}" alt="Default profile picture">
+                                {% endif %}
+                        <h3>
+                            <a class="chat-link" href="#" data-friend-id="{{ follower.followed.id }}">
+                            {{ follower.followed.username }}
+                            </a>
+                        </h3>
+                    </div>
+
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% endif %}
+
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'script.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+{% load static %}
+{% block body %}
+<div class="message-layout">
+    <div class="left-sidebar">
+        <div class="side-bar">
+            <ul>
+                  <li>
+                    {% if user.profile_picture %}
+                    <img src="{{ user.profile_picture.url }}" alt="Profile picture">
+                    {% else %}
+                    <img src="{% static 'default_profile_pic.jpg' %}" alt="Default profile picture">
+                    {% endif %}
+                    <a href="{% url 'profile' id=user.id %}"><strong>{{ user.username }}</strong></a>
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-house"></i><a href="{% url 'index' %}">Home</a>
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-bell"></i><a href="#">Notifications</a>
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-envelope"></i><a href="{% url 'direct_message' %}">Messages</a>
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-gear"></i><a href="#">Settings</a>
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-right-from-bracket"></i> <a href="{% url 'logout' %}">Log Out</a>
+                  </li>
+            </ul>
+        </div>
+    </div>
+
+
+    <div class="user-conversations">
+
+      <div class="search-container">
+        <input type="text" class="search-input" placeholder="Search...">
+        <i class="fa fa-search search-icon"></i>
+      </div>
+      {% for person in following %}
+        <div class="user-conversation-item">
+          <img src="{{ person.followed.profile_picture.url }}" alt="Profile picture">
+          <p><a href="{% url 'chat_room' %}">{{ person.followed.username }}</a></p>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="message-box">
+      {% block first_level_content %}
+
+      {% endblock %}
+    </div>
+
+
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'script.js' %}"></script>
+    <script src="{% static 'messages.js' %}"></script>
+{% endblock %}

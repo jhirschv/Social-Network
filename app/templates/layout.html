@@ -1,0 +1,32 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{% block title %}Social Network{% endblock %}</title>
+        <link href="{% static 'styles.css' %}" rel="stylesheet">
+        <script src="https://kit.fontawesome.com/623361d9b7.js" crossorigin="anonymous"></script>
+        {% block script %}
+        {% endblock %}
+    </head>
+    <body>
+                {% if user.is_authenticated %}
+
+                {% else %}
+                    <li>
+                        <a href="{% url 'login' %}">Log In</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'register' %}">Register</a>
+                    </li>
+                {% endif %}
+              </ul>
+            </div>
+          </nav>
+
+        <div class="body">
+            {% block body %}
+            {% endblock %}
+        </div>
+    </body>
+</html>
